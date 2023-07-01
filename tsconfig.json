@@ -13,7 +13,10 @@
     "strictNullChecks": true,
     "allowJs": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals"],
+    "paths": {
+      "@plasticine/*": ["packages/*/src"]
+    }
   },
   "include": ["packages/**/*.ts"],
   "exclude": ["node_modules"]

@@ -1,8 +1,8 @@
 {
-  "name": "@plasticine/types",
+  "name": "@plasticine/reconciler",
   "version": "0.0.0",
   "author": "Plasticine-Yang",
-  "description": "types of plasticine",
+  "description": "reconciler of plasticine",
   "type": "module",
   "license": "MIT",
   "main": "./dist/index.cjs",
@@ -16,7 +16,7 @@
     }
   },
   "keywords": [
-    "plasticine types"
+    "plasticine reconciler"
   ],
   "scripts": {
     "dev": "tsup --watch",
