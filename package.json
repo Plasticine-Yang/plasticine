@@ -1,0 +1,38 @@
+{
+  "private": true,
+  "author": "Plasticine-Yang",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --filter './packages/**' --filter '!@node-monorepo/foo' --parallel dev",
+    "build": "pnpm --filter './packages/**' --parallel build",
+    "test": "vitest",
+    "test:u": "vitest -u",
+    "commit": "cz",
+    "update-pkgs": "taze -wi",
+    "prepare": "husky install"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.26.1",
+    "@commitlint/cli": "^17.6.5",
+    "@commitlint/config-conventional": "^17.6.5",
+    "@plasticine-yang/eslint-config-typescript": "^0.1.6",
+    "@types/node": "^20.2.6",
+    "commitizen": "^4.3.0",
+    "cz-git": "^1.6.1",
+    "eslint": "^8.42.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.2",
+    "prettier": "^2.8.8",
+    "taze": "^0.10.2",
+    "tsup": "^6.7.0",
+    "tsx": "^3.12.7",
+    "typescript": "^5.1.3",
+    "vitest": "^0.32.0"
+  }
+}
