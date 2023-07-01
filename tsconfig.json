@@ -18,6 +18,6 @@
       "@plasticine/*": ["packages/*/src"]
     }
   },
-  "include": ["packages/**/*.ts"],
+  "include": ["packages/**/*.ts", "plasticine.d.ts"],
   "exclude": ["node_modules"]
 }

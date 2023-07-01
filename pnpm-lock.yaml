@@ -1,4 +1,4 @@
-lockfileVersion: '6.1'
+lockfileVersion: '6.0'
 
 settings:
   autoInstallPeers: true
@@ -57,9 +57,21 @@ importers:
         specifier: ^0.32.0
         version: 0.32.0
 
+  packages/core: {}
+
   packages/demo: {}
 
   packages/foo: {}
+
+  packages/logger: {}
+
+  packages/reconciler:
+    dependencies:
+      '@plasticine/logger':
+        specifier: workspace:^
+        version: link:../logger
+
+  packages/types: {}
 
 packages:
 
