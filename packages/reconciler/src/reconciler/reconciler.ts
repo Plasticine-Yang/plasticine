@@ -10,6 +10,7 @@ import {
 import { PNode, PRootNode } from '../p-node'
 import { Update, UpdateQueue } from '../update'
 import { WorkLoopManager } from '../work-loop-manager'
+import { logger } from '../logger'
 
 class Reconciler<HostContainer> implements IReconciler<HostContainer> {
   private hostConfig: IHostConfig
@@ -17,7 +18,7 @@ class Reconciler<HostContainer> implements IReconciler<HostContainer> {
 
   constructor(hostConfig: IHostConfig) {
     this.hostConfig = hostConfig
-    this.workLoopManager = new WorkLoopManager()
+    this.workLoopManager = new WorkLoopManager(this.hostConfig)
   }
 
   public createPRootNode(hostContainer: HostContainer): IPRootNode<HostContainer> {
@@ -39,6 +40,10 @@ class Reconciler<HostContainer> implements IReconciler<HostContainer> {
     if (updateQueue) {
       const update = new Update(appElement)
       updateQueue.enqueueUpdate(update)
+
+      if (__DEV__) {
+        logger.info('Reconciler#updatePRootNode - 创建 update，并加入到 updateQueue 中')
+      }
     }
 
     this.workLoopManager.scheduleUpdateOnPNode(hostRootPNode)

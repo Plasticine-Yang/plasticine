@@ -38,7 +38,7 @@ class ChildReconciler implements IChildReconciler {
           break
       }
 
-      if (current === null && childPNode !== null) {
+      if (childPNode !== null) {
         // mount 时打上 Placement flag
         const placedPNode = this.placeSingleChild(childPNode)
         return placedPNode
@@ -55,9 +55,13 @@ class ChildReconciler implements IChildReconciler {
     // 文本节点
     if (isPTextNode(childPElement)) {
       const childPNode = this.reconcileSingleTextNode(wip, current, childPElement)
-      const placedPNode = this.placeSingleChild(childPNode)
 
-      return placedPNode
+      if (childPNode !== null) {
+        const placedPNode = this.placeSingleChild(childPNode)
+        return placedPNode
+      }
+
+      return childPNode
     }
 
     if (__DEV__) {
@@ -72,16 +76,11 @@ class ChildReconciler implements IChildReconciler {
 
   /** 调和单个 PElement 节点 */
   private reconcileSingleElement(wip: IPNode, current: IPNode | null, childPElement: IPElement): IPNode | null {
-    if (current === null) {
-      // mount
-      const childPNode = PNode.fromPElement(childPElement)
+    const childPNode = PNode.fromPElement(childPElement)
 
-      if (childPNode) {
-        childPNode.return = wip
-        return childPNode
-      }
-    } else {
-      // TODO update
+    if (childPNode) {
+      childPNode.return = wip
+      return childPNode
     }
 
     return null
@@ -98,7 +97,7 @@ class ChildReconciler implements IChildReconciler {
 
   /** 标记 Placement flag */
   private placeSingleChild(childPNode: IPNode): IPNode {
-    // fiberNode 对应的 current FiberNode 为 null 说明是 mount，需要标记 Placement
+    // PNode 对应的 current PNode 为 null 说明是 mount，需要标记 Placement
     const shouldTagPlacement = childPNode.alternate === null
 
     if (this.shouldTrackSideEffects && shouldTagPlacement) {
@@ -110,9 +109,11 @@ class ChildReconciler implements IChildReconciler {
 }
 
 /** 用于 mount 时调和子节点，不需要为子节点标记 flags */
-const mountChildPNode = new ChildReconciler(false).reconcileChildPNode
+const childReconcilerForMount = new ChildReconciler(false)
+const mountChildPNode = childReconcilerForMount.reconcileChildPNode.bind(childReconcilerForMount)
 
 /** 用于 update 时调和子节点，需要为子节点标记 flags */
-const reconcileChildPNode = new ChildReconciler(true).reconcileChildPNode
+const childReconcilerForUpdate = new ChildReconciler(true)
+const reconcileChildPNode = childReconcilerForMount.reconcileChildPNode.bind(childReconcilerForUpdate)
 
 export { mountChildPNode, reconcileChildPNode }

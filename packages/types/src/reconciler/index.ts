@@ -1,3 +1,5 @@
+export * from './begin-work-manager'
+export * from './complete-work-manager'
 export * from './host-config'
 export * from './p-node'
 export * from './reconciler'

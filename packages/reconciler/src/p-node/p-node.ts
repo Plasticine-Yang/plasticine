@@ -12,6 +12,7 @@ import { logger } from '../logger'
 
 /** 虚拟 DOM 节点 */
 class PNode<HostContainer> implements IPNode<HostContainer> {
+  public type: any
   public tag: PNodeTag
   public child: IPNode<HostContainer> | null
   public sibling: IPNode<HostContainer> | null
@@ -22,8 +23,10 @@ class PNode<HostContainer> implements IPNode<HostContainer> {
   public memoizedState: any
   public pendingProps: PElementProps
   public flags: PNodeFlag
+  public subtreeFlags: PNodeFlag
 
   constructor(tag: PNodeTag, pendingProps: PElementProps) {
+    this.type = null
     this.tag = tag
     this.child = null
     this.sibling = null
@@ -34,6 +37,7 @@ class PNode<HostContainer> implements IPNode<HostContainer> {
     this.memoizedState = null
     this.pendingProps = pendingProps
     this.flags = PNodeFlag.NoFlags
+    this.subtreeFlags = PNodeFlag.NoFlags
   }
 
   /** 根据 PElement 创建 PNode 实例 */
@@ -52,7 +56,11 @@ class PNode<HostContainer> implements IPNode<HostContainer> {
     }
 
     if (pNodeTag !== null) {
-      return new PNode(pNodeTag, props)
+      const pNode = new PNode(pNodeTag, props)
+
+      pNode.type = type
+
+      return pNode
     }
 
     return null

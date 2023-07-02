@@ -5,6 +5,7 @@ import type {
   UpdateActionCallback,
   UpdateActionPayload,
 } from '@plasticine/types'
+import { logger } from '../logger'
 
 class UpdateQueue<State = any> implements IUpdateQueue<State> {
   private shared: { pending: IUpdate<State> | null }
@@ -16,6 +17,10 @@ class UpdateQueue<State = any> implements IUpdateQueue<State> {
   }
 
   public enqueueUpdate(update: IUpdate<State>): void {
+    if (__DEV__) {
+      logger.info('UpdateQueue#enqueueUpdate', update)
+    }
+
     this.shared.pending = update
   }
 
@@ -35,11 +40,19 @@ class UpdateQueue<State = any> implements IUpdateQueue<State> {
       }
     }
 
+    if (__DEV__) {
+      logger.info('UpdateQueue#process', baseState, result)
+    }
+
     return result
   }
 
   public clear(): void {
     this.shared.pending = null
+
+    if (__DEV__) {
+      logger.info('UpdateQueue#clear', this.shared.pending)
+    }
   }
 
   private getPendingUpdate(): IUpdate<State> | null {

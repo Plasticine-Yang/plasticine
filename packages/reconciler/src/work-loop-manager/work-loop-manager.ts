@@ -1,12 +1,29 @@
-import { PNodeTag, type IPNode, type IPRootNode, type IWorkLoopManager } from '@plasticine/types'
+import {
+  PNodeTag,
+  type IBeginWorkManager,
+  type ICompleteWorkManager,
+  type IHostConfig,
+  type IPNode,
+  type IPRootNode,
+  type IWorkLoopManager,
+} from '@plasticine/types'
 
 import { logger } from '../logger'
 import { createWorkInProgress } from '../p-node'
-import { completeWork } from './complete-work'
-import { beginWork } from './begin-work'
+import { BeginWorkManager } from './begin-work-manager'
+import { CompleteWorkManager } from './complete-work-manager'
 
 class WorkLoopManager<HostContainer> implements IWorkLoopManager<HostContainer> {
   private workInProgress: IPNode<HostContainer> | null = null
+  private hostConfig: IHostConfig
+  private beginWorkManager: IBeginWorkManager
+  private completeWorkManager: ICompleteWorkManager
+
+  constructor(hostConfig: IHostConfig) {
+    this.hostConfig = hostConfig
+    this.beginWorkManager = new BeginWorkManager()
+    this.completeWorkManager = new CompleteWorkManager(this.hostConfig)
+  }
 
   /**
    * 为 PNode 调度更新
@@ -14,6 +31,10 @@ class WorkLoopManager<HostContainer> implements IWorkLoopManager<HostContainer> 
    * 从传入的 PNode 出发，往上寻找到 PRootNode 后调用 renderRoot 开启调度
    */
   public scheduleUpdateOnPNode(pNode: IPNode): void {
+    if (__DEV__) {
+      logger.info('WorkLoopManager#scheduleUpdateOnPNode', '开始调度')
+    }
+
     const root = this.findPRootNodeFromPNode(pNode)
 
     if (root) {
@@ -47,14 +68,18 @@ class WorkLoopManager<HostContainer> implements IWorkLoopManager<HostContainer> 
   private renderRoot(root: IPRootNode) {
     // 创建 render phase 的起始工作单元 PNode
     // mount 时会创建新 PNode，update 时则是对已有的 PNode 进行更新
-    this.workInProgress = createWorkInProgress(root.current)
+    this.workInProgress = createWorkInProgress(root.current, {})
+
+    if (__DEV__) {
+      logger.info('WorkLoopManager#renderRoot', '创建 workInProgress', this.workInProgress)
+    }
 
     // 开始 render phase 的工作循环
     try {
       this.workLoop()
     } catch (error) {
       if (__DEV__) {
-        logger.error('执行 workLoop 过程中发生错误：', error)
+        logger.error('WorkLoopManager#renderRoot', '执行 workLoop 过程中发生错误：', error)
       }
 
       this.workInProgress = null
@@ -70,8 +95,16 @@ class WorkLoopManager<HostContainer> implements IWorkLoopManager<HostContainer> 
   }
 
   private performUnitOfWork(pNode: IPNode) {
+    if (__DEV__) {
+      logger.info('WorkLoopManager#performUnitOfWork', '开始消费工作单元', pNode)
+    }
+
     // 开始消费工作单元，进入 `递` 阶段，消费完后会得到下一个工作单元
-    const next = beginWork(pNode)
+    const next = this.beginWorkManager.beginWork(pNode)
+
+    if (__DEV__) {
+      logger.info('WorkLoopManager#performUnitOfWork', 'beginWork 返回的下一个工作单元', next)
+    }
 
     // 没有下一个工作单元，进入 `归` 阶段
     if (next === null) {
@@ -82,11 +115,15 @@ class WorkLoopManager<HostContainer> implements IWorkLoopManager<HostContainer> 
   }
 
   private completeUnitOfWork(pNode: IPNode) {
+    if (__DEV__) {
+      logger.info('WorkLoopManager#completeUnitOfWork', '结束消费工作单元', pNode)
+    }
+
     let node: IPNode | null = pNode
 
     while (node !== null) {
       // 对 node 进行 `归` 阶段的操作
-      completeWork(node)
+      this.completeWorkManager.completeWork(node)
 
       // 对 node 的操作结束后再对其兄弟节点进行操作
       const sibling = node.sibling
