@@ -1,4 +1,14 @@
-import type { IPNode, IPRootNode, IUpdateQueue, PNodeTag } from '@plasticine/types'
+import {
+  IPElement,
+  IPNode,
+  IPRootNode,
+  IUpdateQueue,
+  PElementProps,
+  PNodeFlag,
+  PNodeTag,
+  PTextNode,
+} from '@plasticine/types'
+import { logger } from '../logger'
 
 /** 虚拟 DOM 节点 */
 class PNode<HostContainer> implements IPNode<HostContainer> {
@@ -6,16 +16,51 @@ class PNode<HostContainer> implements IPNode<HostContainer> {
   public child: IPNode<HostContainer> | null
   public sibling: IPNode<HostContainer> | null
   public return: IPNode<HostContainer> | null
-  public stateNode: IPRootNode<HostContainer> | null = null
-  public updateQueue: IUpdateQueue | null = null
+  public stateNode: IPRootNode<HostContainer> | null
+  public updateQueue: IUpdateQueue | null
   public alternate: IPNode<HostContainer> | null
+  public memoizedState: any
+  public pendingProps: PElementProps
+  public flags: PNodeFlag
 
-  constructor(tag: PNodeTag) {
+  constructor(tag: PNodeTag, pendingProps: PElementProps) {
     this.tag = tag
     this.child = null
     this.sibling = null
     this.return = null
+    this.stateNode = null
+    this.updateQueue = null
     this.alternate = null
+    this.memoizedState = null
+    this.pendingProps = pendingProps
+    this.flags = PNodeFlag.NoFlags
+  }
+
+  /** 根据 PElement 创建 PNode 实例 */
+  public static fromPElement(pElement: IPElement): IPNode | null {
+    const { type, props } = pElement
+
+    let pNodeTag: PNodeTag | null = null
+
+    if (typeof type === 'string') {
+      pNodeTag = PNodeTag.HostComponent
+    } else {
+      if (__DEV__) {
+        logger.warn('PNode#fromPElement - 不支持的转换场景')
+        logger.warn('pElement', pElement)
+      }
+    }
+
+    if (pNodeTag !== null) {
+      return new PNode(pNodeTag, props)
+    }
+
+    return null
+  }
+
+  /** 根据 PTextNode 创建 PNode 实例 */
+  public static fromTextNode(textNode: PTextNode): IPNode {
+    return new PNode(PNodeTag.HostText, { textNodeContent: textNode })
   }
 }
 

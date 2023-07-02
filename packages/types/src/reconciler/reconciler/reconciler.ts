@@ -1,5 +1,5 @@
-import type { IPElement } from '../core'
-import type { IPRootNode } from './p-node'
+import type { IPElement } from '../../core'
+import type { IPRootNode } from '../p-node'
 
 /**
  * 宿主环境节点与虚拟 DOM 节点之间的协调器

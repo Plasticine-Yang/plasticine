@@ -1,5 +1,7 @@
-import { IUpdateQueue } from '../update'
-import { PNodeTag } from './tag'
+import type { PElementProps } from '../../core'
+import type { IUpdateQueue } from '../update'
+import type { PNodeFlag } from './flag'
+import type { PNodeTag } from './tag'
 
 export interface IPNode<HostContainer = any> {
   child: IPNode<HostContainer> | null
@@ -20,6 +22,15 @@ export interface IPNode<HostContainer = any> {
 
   /** 指向该 PNode 在双缓存树中的另一颗树里的 PNode */
   alternate: IPNode<HostContainer> | null
+
+  /** 指向更新后的状态 */
+  memoizedState: any
+
+  /** render 阶段在处理的 props */
+  pendingProps: PElementProps
+
+  /** 副作用 flags */
+  flags: PNodeFlag
 }
 
 export interface IPRootNode<HostContainer = any> {
