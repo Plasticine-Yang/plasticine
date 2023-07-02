@@ -4,10 +4,13 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "pnpm --filter './packages/**' --filter '!@node-monorepo/foo' --parallel dev",
+    "dev": "cross-env NODE_ENV=development pnpm --filter './packages/**' --parallel dev",
     "build": "pnpm --filter './packages/**' --parallel build",
     "test": "vitest",
     "test:u": "vitest -u",
+    "play": "pnpm play:dev",
+    "play:dev": "pnpm -C playground dev",
+    "play:build": "pnpm -C playground build",
     "commit": "cz",
     "update-pkgs": "taze -wi",
     "prepare": "husky install"
@@ -24,6 +27,7 @@
     "@plasticine-yang/eslint-config-typescript": "^0.1.6",
     "@types/node": "^20.2.6",
     "commitizen": "^4.3.0",
+    "cross-env": "^7.0.3",
     "cz-git": "^1.6.1",
     "eslint": "^8.42.0",
     "husky": "^8.0.3",
