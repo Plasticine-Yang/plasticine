@@ -1,8 +1,8 @@
 {
-  "name": "@plasticine/types",
+  "name": "@plasticine/dom",
   "version": "0.0.0",
   "author": "Plasticine-Yang",
-  "description": "types of plasticine",
+  "description": "dom renderer of plasticine",
   "type": "module",
   "license": "MIT",
   "main": "./dist/index.cjs",
@@ -16,10 +16,13 @@
     }
   },
   "keywords": [
-    "plasticine types"
+    "plasticine dom renderer"
   ],
   "scripts": {
     "dev": "tsup --watch",
     "build": "tsup --dts --minify"
+  },
+  "dependencies": {
+    "@plasticine/logger": "workspace:^"
   }
 }
